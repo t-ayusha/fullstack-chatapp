@@ -8,7 +8,9 @@ const server=http.createServer(app);
 
 const io=new Server(server,{
     cors:{
-        origin:["http://localhost:5173","https://your-frontend.onrender.com"]
+        origin:["http://localhost:5173","https://your-frontend.onrender.com"],
+        methods: ["GET", "POST"],
+        credentials: true,
     }
 });
 
