@@ -35,7 +35,7 @@ app.use("/api/auth",authRoutes); //authRoutes is inside routes used for user aut
 app.use("/api/messages",messageRoutes);
 
 if(process.env.NODE_ENV==="production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist"))); //middleware to serve static files or production files
+    app.use(express.static(path.join(__dirname,"../frontend/dist/index.html"))); //middleware to serve static files or production files
     
     
     app.get("*",(req,res)=>{ //for any route
