@@ -23,7 +23,7 @@ const __dirname=path.resolve();
 //app.use(express.json());//to extract data in json format
 app.use(cookieParser());//to parse the cookie
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:["http://localhost:5173","https://your-frontend.onrender.com"],
     credentials:true,
 }));//allow cookies with the request
 
