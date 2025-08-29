@@ -22,13 +22,10 @@ const __dirname=path.resolve();
 
 //app.use(express.json());//to extract data in json format
 app.use(cookieParser());//to parse the cookie
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
-
 app.use(cors({
-    origin: CLIENT_URL,  // always a valid string
-    credentials: true
-}));
-//allow cookies with the request
+    origin:"http://localhost:5173",
+    credentials:true,
+}));//allow cookies with the request
 
 app.use(express.json({ limit: '10mb' })); // or more if needed
 app.use(express.urlencoded({ limit: '10mb', extended: true })); // in case you use urlencoded

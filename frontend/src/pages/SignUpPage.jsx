@@ -1,12 +1,10 @@
 import React from 'react'
 import { useAuthStore } from '../store/useAuthStore';
 import { useState } from 'react';
-import {MessageSquare,UserRoundPen,UserPen, MailCheck, MailSearch,Lock, EyeOff, Eye, LockOpen, Loader2 } from 'lucide-react';
+import {MessageSquare,UserPen, MailSearch,Lock, EyeOff, Eye, LockOpen, Loader2 } from 'lucide-react';
 import { FaRegUser } from "react-icons/fa";
 import AuthImagePattern from '../components/AuthImagePattern';
 import toast from 'react-hot-toast';
-
-import { UserPenIcon, UserRoundPenIcon } from "lucide-react";
 import { Link } from 'react-router-dom';
 
 const SignUpPage = () => {
