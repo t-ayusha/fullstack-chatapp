@@ -23,7 +23,7 @@ const __dirname=path.resolve();
 //app.use(express.json());//to extract data in json format
 app.use(cookieParser());//to parse the cookie
 app.use(cors({
-    origin:["http://localhost:5173","https://your-frontend.onrender.com"],
+    origin:"http://localhost:5173",
     credentials:true,
 }));//allow cookies with the request
 
@@ -35,13 +35,12 @@ app.use("/api/auth",authRoutes); //authRoutes is inside routes used for user aut
 app.use("/api/messages",messageRoutes);
 
 if(process.env.NODE_ENV==="production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist/index.html"))); //middleware to serve static files or production files
+    app.use(express.static(path.join(__dirname,"../frontend/dist"))); //middleware to serve static files or production files
     
     
     app.get("*",(req,res)=>{ //for any route
         
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html")); //send index.html file for any route
-    })
+        res.sendFile(path.join(__dirname,"..frontend","dist","index.html"))})
 
 }
 

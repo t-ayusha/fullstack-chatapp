@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import {io } from "socket.io-client";
 
-const BASE_URL=import.meta.env.MODE==="development"?"http://localhost:5001":"https://your-backend.onrender.com"; //to differentiate between dev and prod
+const BASE_URL=import.meta.env.MODE==="development"?"http://localhost:5001":"/"; //to differentiate between dev and prod
 
 export const useAuthStore=create((set,get)=>({
     authUser:null, //as we dont know if user is authenticated or no
