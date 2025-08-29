@@ -9,7 +9,7 @@ export const useAuthStore=create((set,get)=>({
     authUser:null, //as we dont know if user is authenticated or no
 
     isSigningUp:false ,//initially false
-    isLogginIn:false,
+    isLoggingIn:false,
     isUpdatingProfile:false,
 
     isCheckingAuth:true,//as when we one a page it will 1st check the user auth or not
@@ -56,7 +56,7 @@ export const useAuthStore=create((set,get)=>({
         } catch (error) {
             toast.error(error.response.data.message);
         }finally{
-            set({isLogginIn:false});
+            set({isLoggingIn:false});
         }
     },
 
