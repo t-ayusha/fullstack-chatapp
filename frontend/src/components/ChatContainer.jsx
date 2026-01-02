@@ -6,6 +6,7 @@ import MessageInput from './MessageInput';
 import MessageSkeleton from './skeletons/MessageSkeleton';
 import { useAuthStore } from '../store/useAuthStore';
 import { formatMessageTime } from '../lib/utils'
+import { Trash2 } from 'lucide-react';
 const ChatContainer = () => {
   const {messages,getMessages,isMessagesLoading,selectedUser,subscribeToMessages,unsubscribeFromMessages} = useChatStore();
   const {authUser}=useAuthStore();
@@ -64,6 +65,14 @@ const ChatContainer = () => {
                 <img src={message.image} alt="attachment" className="sm:max-w-[200px] rounded-md mb-2"/>
               )}
               {message.text&&<p>{message.text}</p>}
+              {message.senderId === authUser._id && (
+                <button
+                  onClick={() => deleteMessage(message._id)}
+                  className="btn btn-sm btn-ghost self-end mt-1 opacity-50 hover:opacity-100"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
             </div>
           </div>
         ))}
