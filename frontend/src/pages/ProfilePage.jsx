@@ -1,11 +1,11 @@
 import React from 'react'
 import { useAuthStore } from '../store/useAuthStore';
 import { useState } from 'react';
-import { User, Mail, Camera } from 'lucide-react';
+import { User, Mail, Camera, Trash2 } from 'lucide-react';
 
 
 const ProfilePage = () => {
-  const {authUser,isUpdatingProfile,updateProfile}=useAuthStore();
+  const {authUser,isUpdatingProfile,updateProfile,isDeletingAccount,deleteAccount}=useAuthStore();
   const [selectedImg,setSelectedImg]=useState(null);
   const handleImageUpload=async(e)=>{
     const file=e.target.files[0];  //file user selected
@@ -90,6 +90,16 @@ const ProfilePage = () => {
                 <span>Account Status</span>
                 <span className="text-green-500">Active</span>
               </div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={deleteAccount}
+                disabled={isDeletingAccount}
+                className="btn btn-error btn-sm w-full flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                {isDeletingAccount ? "Deleting..." : "Delete Account"}
+              </button>
             </div>
           </div>
       </div>

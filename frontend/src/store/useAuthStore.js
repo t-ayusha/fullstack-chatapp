@@ -11,6 +11,7 @@ export const useAuthStore=create((set,get)=>({
     isSigningUp:false ,//initially false
     isLoggingIn:false,
     isUpdatingProfile:false,
+    isDeletingAccount:false,
 
     isCheckingAuth:true,//as when we one a page it will 1st check the user auth or not
     onlineUsers:[],
@@ -80,10 +81,24 @@ export const useAuthStore=create((set,get)=>({
             toast.success("Updated sucessfullyy!!")
          } catch (error) {
             console.log("error in updating:",error);
-            toast.error(error.response.data.message);            
+            toast.error(error.response.data.message);
          }finally{
             set({isUpdatingProfile:false});
          }
+    },
+
+    deleteAccount:async()=>{
+        set({isDeletingAccount:true});
+        try {
+            await axiosInstance.delete("/auth/delete-account");
+            set({authUser:null});
+            toast.success("Account deleted successfully!");
+            get().disconnectSocket();
+        } catch (error) {
+            toast.error(error.response.data.message);
+        }finally{
+            set({isDeletingAccount:false});
+        }
     },
 
     connectSocket:()=>{

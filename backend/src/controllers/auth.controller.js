@@ -6,7 +6,6 @@ export const signup =async (req,res)=>{
     //res.send("signup route");
     const{fullName,email,password}=req.body
     try{
-        console.log("i am inside backend controller")
         console.log(fullName,email,password);
         if(!fullName || !password || !email){
             return res.status(400).json({message:"All fields are required"});
@@ -117,9 +116,26 @@ export const updateprofile=async(req,res)=>{
 export const checkauth=(req,res)=>{
     try {
         res.status(200).json(req.user);
-        
+
     } catch (error) {
         console.error("error in checkauth controller:",error.message);
         res.status(500).json({message:"Internal server error"});
     }
 }
+
+export const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        // Delete user from database
+        await User.findByIdAndDelete(userId);
+
+        // Clear the JWT cookie
+        res.cookie("jwt", "", { maxAge: 0 });
+
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+        console.error("Error in deleteAccount controller:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};

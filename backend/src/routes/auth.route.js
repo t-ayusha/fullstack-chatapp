@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, signup ,updateprofile,checkauth } from "../controllers/auth.controller.js";
+import { login, logout, signup ,updateprofile,checkauth,deleteAccount } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router =express.Router();
@@ -10,7 +10,9 @@ router.post("/login",login);
 
 router.post("/logout",logout);
 
-router.put("/update-profile",protectRoute,updateprofile); //protectRoute checks if user is authenticated 
+router.put("/update-profile",protectRoute,updateprofile); //protectRoute checks if user is authenticated
+
+router.delete("/delete-account",protectRoute,deleteAccount); //protectRoute checks if user is authenticated
 
 router.get("/check",protectRoute,checkauth);
 
