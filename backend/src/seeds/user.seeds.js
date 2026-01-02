@@ -104,7 +104,13 @@ const seedDatabase=async()=>{
     try {
         await connectDB();
 
-        await User.insertMany(seedUsers);
+        const hashedUsers = await Promise.all(seedUsers.map(async (user) => {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(user.password, salt);
+            return { ...user, password: hashedPassword };
+        }));
+
+        await User.insertMany(hashedUsers);
         console.log("database seeded successfully!")
     } catch (error) {
         console.log("Error seeding database:",error);

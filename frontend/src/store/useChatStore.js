@@ -42,7 +42,18 @@ export const  useChatStore=create((set,get)=>({
             set({messages:[...messages,res.data]});
         } catch (error) {
             toast.error(error.response.data.message);
-            
+
+        }
+    },//setter function
+
+    deleteMessage:async(messageId)=>{
+        const{messages}=get();
+        try {
+            await axiosInstance.delete(`/messages/${messageId}`);
+            set({messages:messages.filter(msg=>msg._id !== messageId)});
+            toast.success("Message deleted");
+        } catch (error) {
+            toast.error(error.response.data.message);
         }
     },//setter function
 
@@ -62,6 +73,12 @@ export const  useChatStore=create((set,get)=>({
                 messages: [...get().messages, newMessage],
             });
         });//listen to new message event
+
+        socket.on("messageDeleted", (messageId) => {
+            set({
+                messages: get().messages.filter(msg => msg._id !== messageId),
+            });
+        });//listen to message deleted event
     },
 
     
