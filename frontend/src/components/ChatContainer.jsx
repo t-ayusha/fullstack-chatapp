@@ -8,7 +8,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { formatMessageTime } from '../lib/utils'
 import { Trash2 } from 'lucide-react';
 const ChatContainer = () => {
-  const {messages,getMessages,isMessagesLoading,selectedUser,subscribeToMessages,unsubscribeFromMessages} = useChatStore();
+  const {messages,getMessages,isMessagesLoading,selectedUser,subscribeToMessages,unsubscribeFromMessages,deleteMessage} = useChatStore();
   const {authUser}=useAuthStore();
   const messageEndRef=useRef(null); //to scroll to bottom when new message arrives
 
