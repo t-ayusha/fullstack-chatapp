@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import { useEffect,useRef } from 'react';
 import ChatHeader from './ChatHeader';
@@ -11,6 +11,7 @@ const ChatContainer = () => {
   const {messages,getMessages,isMessagesLoading,selectedUser,subscribeToMessages,unsubscribeFromMessages,deleteMessage} = useChatStore();
   const {authUser}=useAuthStore();
   const messageEndRef=useRef(null); //to scroll to bottom when new message arrives
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
 
   
   useEffect(()=>{
@@ -60,15 +61,27 @@ const ChatContainer = () => {
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div
+              className="chat-bubble flex flex-col cursor-pointer"
+              onDoubleClick={() => setSelectedMessageId(message._id)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setSelectedMessageId(message._id);
+              }}
+              onClick={() => setSelectedMessageId(null)}
+            >
               {message.image&&(
                 <img src={message.image} alt="attachment" className="sm:max-w-[200px] rounded-md mb-2"/>
               )}
               {message.text&&<p>{message.text}</p>}
-              {message.senderId === authUser._id && (
+              {message.senderId === authUser._id && selectedMessageId === message._id && (
                 <button
-                  onClick={() => deleteMessage(message._id)}
-                  className="btn btn-sm btn-ghost self-end mt-1 opacity-50 hover:opacity-100"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMessage(message._id);
+                    setSelectedMessageId(null);
+                  }}
+                  className="btn btn-sm btn-ghost self-end mt-1"
                 >
                   <Trash2 size={14} />
                 </button>
