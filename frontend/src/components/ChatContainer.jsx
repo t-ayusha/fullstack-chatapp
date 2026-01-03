@@ -56,11 +56,7 @@ const ChatContainer = () => {
 
               </div>
             </div>
-            <div className="chat-header mb-1">
-              <time className="text-xs  opacity-50 ml-1">
-                {formatMessageTime(message.createdAt)}
-              </time>
-            </div>
+            
             <div
               className="chat-bubble flex flex-col cursor-pointer"
               onDoubleClick={() => setSelectedMessageId(message._id)}
@@ -86,6 +82,11 @@ const ChatContainer = () => {
                   <Trash2 size={14} />
                 </button>
               )}
+            </div>
+            <div className="chat-header mb-1">
+              <time className="text-xs  opacity-50 ml-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
             </div>
           </div>
         ))}
