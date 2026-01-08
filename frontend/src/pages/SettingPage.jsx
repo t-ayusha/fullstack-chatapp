@@ -24,23 +24,26 @@ const SettingPage = () => {
         <div className="grid grid-cols-4 md:grid-cols-8 sm:grid-cols-6 gap-2">
           {THEMES.map((t) => (
             <button
-              key={t}
+              key={t.name}
               className={`
                 group flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors
-                ${theme === t ? "bg-base-200" : "hover:bg-base-200/50"}
+                ${theme === t.name ? "bg-primary/10 text-primary" : "hover:bg-base-200/50"}
               `}
-              onClick={() => setTheme(t)}
+              onClick={() => setTheme(t.name)}
             >
               <div className="relative h-8 w-full rounded-md overflow-hidden" data-theme={t}>
                 <div className="absolute inset-0 grid grid-cols-4 gap-px p-1">
-                  <div className="rounded bg-primary"></div>
-                  <div className="rounded bg-secondary"></div>
-                  <div className="rounded bg-accent"></div>
-                  <div className="rounded bg-neutral"></div>
+                  {t.colors.map((color, i) => (
+                  <span
+                    key={i}
+                    className="size-2 rounded"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
                 </div>
               </div>
               <span className="text-[11px] font-medium truncate w-full text-center">
-               {t.charAt(0).toUpperCase() + t.slice(1)}  {/*  theme name */}
+               {t.label}  {/*  theme name */}
               </span>
             </button>
           ))}
