@@ -37,8 +37,8 @@ const App = () => {
     </div>
   )
   return (
-    <div data-theme={theme}>
-      
+    <div>
+
       <Navbar  />
       <Routes>
         <Route path="/" element={authUser? <HomePage/> : <Navigate to="/login"/> }/> {/*if not authorized then navigate to login*/}
