@@ -33,10 +33,10 @@ const SettingPage = () => {
             >
               <div data-theme={t} className="relative h-8 w-full rounded-md overflow-hidden">
                 <div className="absolute inset-0 grid grid-cols-4 gap-px p-1">
-                  <div className="rounded bg-primary"></div>
-                  <div className="rounded bg-secondary"></div>
-                  <div className="rounded bg-accent"></div>
-                  <div className="rounded bg-neutral"></div>
+                  <div className="rounded bg-[hsl(var(--p))]"></div>
+                  <div className="rounded bg-[hsl(var(--s))]"></div>
+                  <div className="rounded bg-[hsl(var(--a))]"></div>
+                  <div className="rounded bg-[hsl(var(--n))]"></div>
                 </div>
               </div>
               <span className="text-[11px] font-medium truncate w-full text-center">
