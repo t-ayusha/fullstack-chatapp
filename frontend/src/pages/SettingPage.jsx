@@ -31,7 +31,7 @@ const SettingPage = () => {
               `}
               onClick={() => setTheme(t)}
             >
-              <div className="relative h-8 w-full rounded-md overflow-hidden" data-theme={t}>
+              <div data-theme={t} className="relative h-8 w-full rounded-md overflow-hidden">
                 <div className="absolute inset-0 grid grid-cols-4 gap-px p-1">
                   <div className="rounded bg-primary"></div>
                   <div className="rounded bg-secondary"></div>
