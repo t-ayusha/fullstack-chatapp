@@ -5,6 +5,7 @@ import SignUpPage from './pages/SignUpPage';
 import HomePage from './pages/HomePage';
 import SettingPage from './pages/SettingPage';
 import ProfilePage from './pages/ProfilePage';
+import CallModal from './components/CallModal';
 import { Routes,Route,Navigate } from 'react-router-dom'; //Route for specific routes
 import {Toaster} from "react-hot-toast";
 
@@ -50,7 +51,8 @@ const App = () => {
       </Routes>
 
       <Toaster/>
-      
+      <CallModal />
+
     </div>
   )
 };

@@ -27,6 +27,38 @@ io.on("connection",(socket)=>{
     //io.emit() is used to send event to all connected clients
     io.emit("getOnlineUsers",Object.keys(userSocketMap)); //emit to all users about online users
 
+    // Call-related events
+    socket.on("callUser", (data) => {
+        const { to, from, signalData, type } = data;
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("callIncoming", { from, signalData, type });
+        }
+    });
+
+    socket.on("answerCall", (data) => {
+        const { to, signalData } = data;
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("callAccepted", signalData);
+        }
+    });
+
+    socket.on("iceCandidate", (data) => {
+        const { to, candidate } = data;
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("iceCandidate", candidate);
+        }
+    });
+
+    socket.on("endCall", (data) => {
+        const { to } = data;
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("callEnded");
+        }
+    });
 
     socket.on("disconnect",()=>{
         console.log("A user is disconnected ",socket.id);
