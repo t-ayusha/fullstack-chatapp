@@ -49,20 +49,12 @@ export const useCallStore = create((set, get) => ({
 
       // Handle remote stream
       peerConnection.ontrack = (event) => {
-        console.log("Received remote stream:", event.streams[0]);
-        console.log("Remote tracks:", event.streams[0].getTracks().map(track => `${track.kind}: ${track.enabled}`));
         set({ userStream: event.streams[0] });
-      };
-
-      // Handle connection state changes
-      peerConnection.onconnectionstatechange = () => {
-        console.log("Connection state:", peerConnection.connectionState);
       };
 
       // Handle ICE candidates
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log("Sending ICE candidate");
           const socket = useAuthStore.getState().socket;
           socket.emit("iceCandidate", {
             to: userId,
@@ -127,20 +119,12 @@ export const useCallStore = create((set, get) => ({
 
       // Handle remote stream
       peerConnection.ontrack = (event) => {
-        console.log("Received remote stream:", event.streams[0]);
-        console.log("Remote tracks:", event.streams[0].getTracks().map(track => `${track.kind}: ${track.enabled}`));
         set({ userStream: event.streams[0] });
-      };
-
-      // Handle connection state changes
-      peerConnection.onconnectionstatechange = () => {
-        console.log("Connection state:", peerConnection.connectionState);
       };
 
       // Handle ICE candidates
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log("Sending ICE candidate");
           const socket = useAuthStore.getState().socket;
           socket.emit("iceCandidate", {
             to: caller,
@@ -171,7 +155,7 @@ export const useCallStore = create((set, get) => ({
   },
 
   endCall: () => {
-    const { peerConnection, myStream, caller } = get();
+    const { peerConnection, myStream } = get();
     if (peerConnection) {
       peerConnection.close();
     }
@@ -179,8 +163,7 @@ export const useCallStore = create((set, get) => ({
       myStream.getTracks().forEach(track => track.stop());
     }
     const socket = useAuthStore.getState().socket;
-    // Emit to the other user (either the caller or the receiver)
-    socket.emit("endCall", { to: caller });
+    socket.emit("endCall", { to: get().caller });
 
     set({
       isCallActive: false,
@@ -215,27 +198,18 @@ export const useCallStore = create((set, get) => ({
     socket.on("callAccepted", async (signal) => {
       const { peerConnection } = get();
       if (peerConnection) {
-        try {
-          await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
-        } catch (error) {
-          console.error("Error setting remote description:", error);
-        }
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
       }
     });
 
     socket.on("callEnded", () => {
-      console.log("Call ended by other user");
       get().endCall();
     });
 
     socket.on("iceCandidate", (candidate) => {
       const { peerConnection } = get();
-      if (peerConnection && candidate) {
-        try {
-          peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (error) {
-          console.error("Error adding ICE candidate:", error);
-        }
+      if (peerConnection) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       }
     });
   },
