@@ -12,6 +12,7 @@ import {Toaster} from "react-hot-toast";
 import { axiosInstance } from './lib/axios';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
+import { useCallStore } from './store/useCallStore';
 
 import {Loader} from "lucide-react";
 
@@ -20,6 +21,7 @@ const App = () => {
   const {authUser,checkAuth,isCheckingAuth,onlineUsers}=useAuthStore() //useAuthStore() is a hook and herewe are destructuring the function
   //here checkAuth is there to check user when we open any page
   const{theme}=useThemeStore()
+  const {subscribeToCalls}=useCallStore()
 
   console.log({onlineUsers});
 
@@ -30,6 +32,12 @@ const App = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (authUser) {
+      subscribeToCalls();
+    }
+  }, [authUser, subscribeToCalls]);
   console.log({authUser});
   if(isCheckingAuth && !authUser) 
     return(
