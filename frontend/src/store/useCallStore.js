@@ -50,6 +50,7 @@ export const useCallStore = create((set, get) => ({
       // Handle remote stream
       peerConnection.ontrack = (event) => {
         console.log("Received remote stream:", event.streams[0]);
+        console.log("Remote tracks:", event.streams[0].getTracks().map(track => `${track.kind}: ${track.enabled}`));
         set({ userStream: event.streams[0] });
       };
 
@@ -127,6 +128,7 @@ export const useCallStore = create((set, get) => ({
       // Handle remote stream
       peerConnection.ontrack = (event) => {
         console.log("Received remote stream:", event.streams[0]);
+        console.log("Remote tracks:", event.streams[0].getTracks().map(track => `${track.kind}: ${track.enabled}`));
         set({ userStream: event.streams[0] });
       };
 

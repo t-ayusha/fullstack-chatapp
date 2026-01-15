@@ -16,6 +16,7 @@ const CallModal = () => {
 
   const myVideoRef = useRef();
   const userVideoRef = useRef();
+  const userAudioRef = useRef();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
 
@@ -26,8 +27,13 @@ const CallModal = () => {
   }, [myStream]);
 
   useEffect(() => {
-    if (userStream && userVideoRef.current) {
-      userVideoRef.current.srcObject = userStream;
+    if (userStream) {
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = userStream;
+      }
+      if (userAudioRef.current) {
+        userAudioRef.current.srcObject = userStream;
+      }
     }
   }, [userStream]);
 
@@ -82,6 +88,9 @@ const CallModal = () => {
             <h3 className="text-lg font-semibold mb-4">
               {callType === 'video' ? 'Video' : 'Voice'} Call
             </h3>
+
+            {/* Hidden audio element for voice calls */}
+            <audio ref={userAudioRef} autoPlay />
 
             {callType === 'video' && (
               <div className="relative mb-4">
