@@ -16,10 +16,22 @@ export const useCallStore = create((set, get) => ({
   // Actions
   startCall: async (userId, type) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: type === 'video',
-        audio: true,
-      });
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: type === 'video' ? {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          frameRate: { ideal: 30 }
+        } : false,
+      };
+
+      console.log("Requesting media with constraints:", constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log("Got media stream:", stream.getTracks().map(track => `${track.kind}: ${track.enabled}`));
 
       set({ myStream: stream, callType: type });
 
@@ -81,10 +93,22 @@ export const useCallStore = create((set, get) => ({
   answerCall: async () => {
     try {
       const { callerSignal, callType, caller } = get();
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: callType === 'video',
-        audio: true,
-      });
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: callType === 'video' ? {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          frameRate: { ideal: 30 }
+        } : false,
+      };
+
+      console.log("Answering call with constraints:", constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log("Got answer media stream:", stream.getTracks().map(track => `${track.kind}: ${track.enabled}`));
 
       set({ myStream: stream });
 
