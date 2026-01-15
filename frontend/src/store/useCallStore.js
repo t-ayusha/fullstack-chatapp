@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { useAuthStore } from "./useAuthStore";
-import Peer from "simple-peer";
 
 export const useCallStore = create((set, get) => ({
   // Call state
@@ -11,7 +10,8 @@ export const useCallStore = create((set, get) => ({
   callType: null, // 'voice' or 'video'
   myStream: null,
   userStream: null,
-  peer: null,
+  peerConnection: null,
+  localDescription: null,
 
   // Actions
   startCall: async (userId, type) => {
@@ -23,27 +23,49 @@ export const useCallStore = create((set, get) => ({
 
       set({ myStream: stream, callType: type });
 
-      const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        stream: stream,
+      const peerConnection = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
       });
 
-      peer.on("signal", (data) => {
-        const socket = useAuthStore.getState().socket;
-        socket.emit("callUser", {
-          to: userId,
-          from: useAuthStore.getState().authUser._id,
-          signalData: data,
-          type,
-        });
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, stream);
       });
 
-      peer.on("stream", (stream) => {
-        set({ userStream: stream });
+      // Handle remote stream
+      peerConnection.ontrack = (event) => {
+        set({ userStream: event.streams[0] });
+      };
+
+      // Handle ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          const socket = useAuthStore.getState().socket;
+          socket.emit("iceCandidate", {
+            to: userId,
+            candidate: event.candidate,
+          });
+        }
+      };
+
+      // Create offer
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      set({ peerConnection, isCallActive: true });
+
+      // Send offer via socket
+      const socket = useAuthStore.getState().socket;
+      socket.emit("callUser", {
+        to: userId,
+        from: useAuthStore.getState().authUser._id,
+        signalData: offer,
+        type,
       });
 
-      set({ peer, isCallActive: true });
     } catch (error) {
       console.error("Error starting call:", error);
     }
@@ -51,7 +73,7 @@ export const useCallStore = create((set, get) => ({
 
   answerCall: async () => {
     try {
-      const { callerSignal, callType } = get();
+      const { callerSignal, callType, caller } = get();
       const stream = await navigator.mediaDevices.getUserMedia({
         video: callType === 'video',
         audio: true,
@@ -59,35 +81,59 @@ export const useCallStore = create((set, get) => ({
 
       set({ myStream: stream });
 
-      const peer = new Peer({
-        initiator: false,
-        trickle: false,
-        stream: stream,
+      const peerConnection = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
       });
 
-      peer.on("signal", (data) => {
-        const socket = useAuthStore.getState().socket;
-        socket.emit("answerCall", {
-          to: get().caller,
-          signalData: data,
-        });
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, stream);
       });
 
-      peer.on("stream", (stream) => {
-        set({ userStream: stream });
+      // Handle remote stream
+      peerConnection.ontrack = (event) => {
+        set({ userStream: event.streams[0] });
+      };
+
+      // Handle ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          const socket = useAuthStore.getState().socket;
+          socket.emit("iceCandidate", {
+            to: caller,
+            candidate: event.candidate,
+          });
+        }
+      };
+
+      // Set remote description (offer)
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(callerSignal));
+
+      // Create answer
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+
+      set({ peerConnection, isCallActive: true, isReceivingCall: false });
+
+      // Send answer via socket
+      const socket = useAuthStore.getState().socket;
+      socket.emit("answerCall", {
+        to: caller,
+        signalData: answer,
       });
 
-      peer.signal(callerSignal);
-      set({ peer, isCallActive: true, isReceivingCall: false });
     } catch (error) {
       console.error("Error answering call:", error);
     }
   },
 
   endCall: () => {
-    const { peer, myStream } = get();
-    if (peer) {
-      peer.destroy();
+    const { peerConnection, myStream } = get();
+    if (peerConnection) {
+      peerConnection.close();
     }
     if (myStream) {
       myStream.getTracks().forEach(track => track.stop());
@@ -103,7 +149,8 @@ export const useCallStore = create((set, get) => ({
       callType: null,
       myStream: null,
       userStream: null,
-      peer: null,
+      peerConnection: null,
+      localDescription: null,
     });
   },
 
@@ -124,10 +171,10 @@ export const useCallStore = create((set, get) => ({
       get().setReceivingCall(from, signalData, type);
     });
 
-    socket.on("callAccepted", (signal) => {
-      const { peer } = get();
-      if (peer) {
-        peer.signal(signal);
+    socket.on("callAccepted", async (signal) => {
+      const { peerConnection } = get();
+      if (peerConnection) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
       }
     });
 
@@ -136,9 +183,9 @@ export const useCallStore = create((set, get) => ({
     });
 
     socket.on("iceCandidate", (candidate) => {
-      const { peer } = get();
-      if (peer) {
-        peer.signal(candidate);
+      const { peerConnection } = get();
+      if (peerConnection) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       }
     });
   },
